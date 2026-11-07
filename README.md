@@ -10,10 +10,15 @@ A phone-first **Tekken 7 Steve Fox** guide for complete beginners: a move list w
 | --- | --- | --- | --- |
 | ![Learn](screenshots/learn.png) | ![Moves](screenshots/moves.png) | ![Combos](screenshots/combos.png) | ![Tech](screenshots/tech.png) |
 
+On a computer, the tabs move into a sidebar:
+
+![Desktop move list](screenshots/desk.png)
+
 ## What it does
 
 **Starting from zero**
 - **A beginner path** of 9 steps, in order: read the inputs, understand Steve, learn the first 14 moves, 4 punishers, one combo, the game plan, stance tech, the practice drills, then the basics video. Tick each off as you go.
+- **A frame meter on every move** shows at a glance whether it's punishable, safe or plus on block.
 - **Inputs you can read at a glance.** Every move is drawn as arrows (filled when you hold the direction) and a 1-2-3-4 button pad, with a plain-English line like "hold back and button 1".
 - **Notation and frame data explained** in two short lists, so `d/f+1`, `~B`, `i13` and `-14` all make sense.
 
