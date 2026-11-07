@@ -251,7 +251,25 @@ function viewTech() {
         </section>`).join('')}`).join('')}`;
 }
 
+const EMBED = !window.PEEKABOO_NO_EMBED;
+
 function videoCard(v) {
+  if (!EMBED) {
+    return `
+  <article class="video">
+    <a class="play poster" href="${v.url}" target="_blank" rel="noopener" aria-label="Watch ${esc(v.title)} on YouTube">
+      <span class="pbtn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5l12 7-12 7z"/></svg></span>
+      <span class="ptitle">${esc(v.title)}</span>
+    </a>
+    <div class="vbody">
+      <span class="badge b-${v.level.toLowerCase().replace(/\s/g, '')}">${esc(v.level)}</span>
+      <h3>${esc(v.title)}</h3>
+      <p>${esc(v.why)}</p>
+      ${v.chapters ? `<div class="chapters">${v.chapters.map(([s, n]) => `<a class="fchip" href="${v.url}&t=${s}s" target="_blank" rel="noopener">${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} ${esc(n)}</a>`).join('')}</div>` : ''}
+      <a class="link" href="${v.url}" target="_blank" rel="noopener">Open on YouTube ↗</a>
+    </div>
+  </article>`;
+  }
   return `
   <article class="video">
     <div class="frame" data-id="${v.id}">
@@ -365,6 +383,8 @@ document.addEventListener('input', (e) => {
 
 draw();
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+try {
+  if (EMBED && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+} catch { /* no service worker here */ }

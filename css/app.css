@@ -58,6 +58,30 @@
     color-scheme: dark;
   }
 }
+:root[data-theme="dark"] {
+    --bg: #0B111D;
+    --surface: #151E30;
+    --sunk: #1D2840;
+    --ink: #EEF1F7;
+    --muted: #9AA5BB;
+    --line: #26324B;
+    --red: #F0625A;
+    --red-soft: #3A1C1F;
+    --gold: #F2B33D;
+    --gold-soft: #3A2E14;
+    --blue: #7EA6F2;
+    --blue-soft: #1B2948;
+    --hero: #18233A;
+    --plus: #5BD08B;
+    --safe: #E8C35A;
+    --unsafe: #F0625A;
+    --high: #F0625A;
+    --mid: #F2B33D;
+    --low: #7EA6F2;
+    --pad-off: #34405A;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+    color-scheme: dark;
+  }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -73,7 +97,7 @@ code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-si
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 .app { max-width: 640px; margin: 0 auto; }
-.view { padding: 16px 16px 120px; outline: none; }
+.view { padding-block: 16px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); outline: none; }
 
 h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0 0 8px; letter-spacing: 0.01em; }
 h1 { font-size: 38px; font-weight: 800; text-transform: uppercase; }
@@ -217,7 +241,7 @@ p { margin: 0 0 12px; }
 .fchips { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 4px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; }
 .fchips::-webkit-scrollbar { display: none; }
 .fchip {
-  flex: none; border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px;
+  flex: none; text-decoration: none; color: var(--ink); border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px;
   padding: 7px 13px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
 }
 .fchip.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
@@ -305,6 +329,8 @@ p { margin: 0 0 12px; }
 .play img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; }
 .pbtn { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 68px; height: 48px; border-radius: 14px; background: var(--red); display: grid; place-items: center; }
 .pbtn svg { width: 26px; height: 26px; fill: #fff; }
+.poster { display: block; position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: radial-gradient(circle at 30% 20%, var(--red-soft), var(--hero) 70%); text-decoration: none; }
+.ptitle { position: absolute; left: 16px; right: 16px; bottom: 12px; font: 800 20px/1.1 var(--display); text-transform: uppercase; color: var(--hero-ink); text-wrap: balance; }
 .vbody { padding: 14px 16px 16px; }
 .vbody h3 { margin-top: 8px; }
 .vbody p { color: var(--muted); }

@@ -140,6 +140,7 @@ export const MOVES = [
   { c: 'DCK 2', lvl: 'm', dmg: '15', i: '19', blk: '-14~-12', hit: 'Launch', ch: 'Launch', cat: 'DCK' },
   { c: 'DCK f+2', lvl: 'h', dmg: '21', i: '15', blk: '-7~-6', hit: 'KND', ch: 'S', cat: 'DCK', note: 'Fast high, knocks down; tailspin on CH' },
   { c: 'DCK 1+2', lvl: 'm', dmg: '3', i: '16', blk: '-6', hit: '0', ch: '0', cat: 'DCK', note: 'Keep pressing 1,2 for the rapid-punch flurry' },
+  { c: 'DCK d/b', lvl: 'stance', dmg: '-', i: '-', blk: '-', hit: '-', ch: '-', cat: 'DCK', note: 'Duck cancel: drops Duck into a crouch, so a WS move (like WS 1,2) comes out right away. See Tech.' },
   { c: 'Ext DCK f+2', lvl: 'h', dmg: '28', i: '15', blk: '+5~+6', hit: 'CS', ch: 'CS', cat: 'DCK', note: 'From f+3 then hold F' },
 
   // ---------- Weaves (3 or 4, also at the end of many strings) ----------
