@@ -45,6 +45,8 @@ export const PATH = [
     body: 'Poke, frame trap, cover with Flicker, catch them with counter hits. The whole character in one loop.' },
   { id: 'tech', title: 'Add stance tech', tab: 'tech',
     body: 'Holding back into Flicker to stay safe is the first habit. Peekaboo and Duck pressure come after.' },
+  { id: 'drill', title: 'Run the practice drills', tab: 'train',
+    body: 'Six Practice-mode drills with the exact setup: punishing, the ~B habit, counter hits, blocking lows, duck cancel and combos.' },
   { id: 'watch', title: 'Watch the basics video', tab: 'videos',
     body: 'Seeing the moves used in real matches makes them stick. The Videos tab is ordered from beginner up.' },
 ];
@@ -212,4 +214,89 @@ export const TECH = [
     { name: 'Frame Data Display', inputs: [],
       body: 'Tekken 7’s Frame Data Display add-on shows startup and on-block frames in Practice mode. Use it to check any number in this app.' },
   ] },
+];
+
+// Stance map: how Steve moves between stances. Inputs from RBN frame data
+// (the "to FLK / to PAB / to Weave / Cancel" rows) and the guides above.
+export const STANCE_NODES = [
+  { id: 'STD', label: 'Standing', short: 'Neutral', x: 200, y: 170 },
+  { id: 'FLK', label: 'Flicker', short: 'Defensive', x: 70, y: 70 },
+  { id: 'PAB', label: 'Peekaboo', short: 'Offensive', x: 330, y: 70 },
+  { id: 'DCK', label: 'Duck', short: 'Under highs', x: 330, y: 270 },
+  { id: 'SWY', label: 'Sway', short: 'Lean back', x: 70, y: 270 },
+  { id: 'WV', label: 'Weaves', short: 'LWV / RWV', x: 200, y: 40 },
+  { id: 'CR', label: 'Crouch', short: 'WS moves', x: 200, y: 310 },
+];
+
+export const STANCE_EDGES = [
+  { from: 'STD', to: 'FLK', inputs: ['b+3+4', 'b+1~B', '2,1~B', '1,2,1~B', 'qcf+1~B'], note: 'Hold B at the end of many moves.' },
+  { from: 'STD', to: 'PAB', inputs: ['f+3+4', '2,1~F', '1,2,1~F', 'b+1,2~F'], note: 'Hold F at the end of some moves.' },
+  { from: 'STD', to: 'DCK', inputs: ['f+3', 'f+4', '1,1,2,f+3'], note: 'Hold F after f+3 for Extended Duck.' },
+  { from: 'STD', to: 'SWY', inputs: ['b+3', 'b+4', '1,1,2~B'], note: 'Leans back under highs.' },
+  { from: 'STD', to: 'WV', inputs: ['3', '4'], note: 'Many strings also end in a weave if you press 3 or 4.' },
+  { from: 'FLK', to: 'PAB', inputs: ['FLK f+3+4'], note: 'Switch from defence to offence.' },
+  { from: 'FLK', to: 'WV', inputs: ['FLK 3', 'FLK 4'], note: 'Weave out of Flicker.' },
+  { from: 'FLK', to: 'CR', inputs: ['FLK d/b'], note: 'Flicker cancel. Let go of down for a WS move.' },
+  { from: 'PAB', to: 'CR', inputs: ['PAB d/b'], note: 'Peekaboo cancel.' },
+  { from: 'DCK', to: 'CR', inputs: ['DCK d/b'], note: 'Duck cancel into WS 1,2.' },
+  { from: 'CR', to: 'STD', inputs: ['WS 1,2', 'WS 2'], note: 'Stand up with an attack, or just let go.' },
+];
+
+export const STANCE_MOVES = {
+  FLK: ['FLK 1', 'FLK 1,d+1', 'FLK 2', 'FLK b+2'],
+  PAB: ['PAB 1', 'PAB d/f+1,2', 'PAB 2', 'PAB d+2'],
+  DCK: ['DCK 1', 'DCK f+2', 'Ext DCK f+2'],
+  SWY: ['SWY 1', 'SWY 2'],
+  WV: ['LWV 1', 'LWV 2', 'RWV 1,2', 'RWV 2'],
+  CR: ['WS 1,2', 'WS 2', 'd/b+1'],
+  STD: ['1,2', 'd/f+1', 'b+1~B', 'd/f+2'],
+};
+
+// Practice-mode drills. Menu names follow Tekken 7's Practice mode
+// (Dummy settings, Action recording, Punishment Training, Frame Data Display).
+export const DRILLS = [
+  { id: 'd-punish', title: 'Punish on reaction', goal: 'Make 1,1,2, 2,1~B and f+1+2,2 automatic.',
+    setup: ['Practice mode → choose Punishment Training.', 'Pick a character you keep losing to.', 'The game repeats their unsafe moves and shows how negative each one is.'],
+    reps: 'Punish 10 in a row with the right button for the frame: -10 → 1,1,2, -12 → 2,1~B, -15 → f+1+2,2.',
+    inputs: ['1,1,2', '2,1~B', 'f+1+2,2'] },
+  { id: 'd-hook', title: 'The ~B habit', goal: 'Never throw b+1 without holding back.',
+    setup: ['Practice mode → Dummy settings → Guard: All.', 'Turn on Frame Data Display.'],
+    reps: 'Do b+1~B, then FLK 1. Check the frame display reads about -1, not -14. Repeat 20 times until you hold back without thinking.',
+    inputs: ['b+1~B', 'FLK 1'] },
+  { id: 'd-ch', title: 'Catch a button (counter hit)', goal: 'Learn when b+1 and d/f+2 counter hit.',
+    setup: ['Dummy settings → Action → Record. Take control of the dummy and make it block once, then jab.', 'Stop recording and set the dummy to play it back on repeat.'],
+    reps: 'Hit the dummy with 1, then immediately b+1 or d/f+2. If you see COUNTER, do the combo. If the dummy jabs first, you were too slow.',
+    inputs: ['1', 'b+1~B', 'd/f+2'] },
+  { id: 'd-low', title: 'Block low, punish with WS 1,2', goal: 'Stop eating lows and punish them.',
+    setup: ['Dummy settings → Action → Record. Make the dummy do a slow, unsafe low (a sweep).', 'Set playback to random or repeat.'],
+    reps: 'Hold d/b to block, then let go and press 1,2 as you stand: WS 1,2. Land it 10 times.',
+    inputs: ['D/B', 'WS 1,2'] },
+  { id: 'd-dck', title: 'Duck cancel', goal: 'Get the d/b cancel timing.',
+    setup: ['Dummy settings → Guard: All.'],
+    reps: 'Ext DCK f+2 (blocked), then d/b and WS 1,2 as fast as you can. With Frame Data Display, WS 1,2 should hit before the dummy can block. Then try it from Flicker: b+3+4, d/b, WS 1,2.',
+    inputs: ['Ext DCK f+2', 'DCK d/b', 'WS 1,2'] },
+  { id: 'd-combo', title: 'Combo on both sides', goal: 'Land your bread-and-butter anywhere.',
+    setup: ['Dummy settings → Counter hit: on (so b+1 always counter hits).'],
+    reps: 'Land CH b+1,2 five times in a row, then switch sides (the dummy reset swaps sides) and do it five more. Then the screw route.',
+    inputs: ['CH b+1,2', 'CH b+1~B', 'FLK 1,d+1 S!'] },
+];
+
+// Matchup notes by character type. General Tekken 7 knowledge applied to
+// Steve's tools; examples are well-known Tekken 7 characters of each type.
+export const MATCHUPS = [
+  { type: 'Hellsweep characters', who: 'Kazuya, Devil Jin, Heihachi',
+    plan: 'Their fast low sweep and mid launcher form a 50/50. Steve’s lows are weak, so the low is the dangerous part. When you block the sweep, punish hard with WS 1,2. Stay close and keep them blocking jabs so they don’t get time to dash in.',
+    tools: ['D/B', 'WS 1,2', '1,2'] },
+  { type: 'Stance and low-profile characters', who: 'Hwoarang, Xiaoyu, Lei, Zafina',
+    plan: 'Their stances duck under highs, and most of Steve’s offense is high. Use mids: d/f+1, d/f+2 (homing) and PAB d/f+1,2. Don’t throw b+1 into a stance that ducks.',
+    tools: ['d/f+1', 'd/f+2', 'PAB d/f+1,2'] },
+  { type: 'Grapplers', who: 'King, Armor King',
+    plan: 'Learn the throw-break buttons (1, 2, 1+2) for their common grabs, and don’t freeze when they get close. Keep them out with jabs and d/f+1 so they can’t walk up and grab.',
+    tools: ['1', '1+2', 'd/b+1'] },
+  { type: 'Big, slow characters', who: 'Jack-7, Gigas, Kuma',
+    plan: 'Long range, slow buttons. Get inside with dashes and jabs; their big moves are often very negative on block, so check frames and punish. Don’t trade hits from far away.',
+    tools: ['1,2', 'f,F+2', 'f+1+2,2'] },
+  { type: 'Fast pokers and counter-hitters', who: 'Lili, Lee, Steve mirror',
+    plan: 'They play your game. Be patient: block more, sidestep their linear strings, and punish. Use the parry (b+1+2) when you know a punch is coming.',
+    tools: ['b+1+2', 'u', '2,1~B'] },
 ];

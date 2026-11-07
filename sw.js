@@ -1,7 +1,7 @@
 // Offline support: the app's own files are cached on install and served
 // from cache first, refreshed in the background. Bump CACHE when files change.
 // YouTube videos and thumbnails are not cached; they need a connection.
-const CACHE = 'peekaboo-v1';
+const CACHE = 'peekaboo-v2';
 const FILES = [
   './',
   'index.html',

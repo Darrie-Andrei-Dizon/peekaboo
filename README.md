@@ -13,7 +13,7 @@ A phone-first **Tekken 7 Steve Fox** guide for complete beginners: a move list w
 ## What it does
 
 **Starting from zero**
-- **A beginner path** of 8 steps, in order: read the inputs, understand Steve, learn the first 14 moves, 4 punishers, one combo, the game plan, stance tech, then watch the basics video. Tick each off as you go.
+- **A beginner path** of 9 steps, in order: read the inputs, understand Steve, learn the first 14 moves, 4 punishers, one combo, the game plan, stance tech, the practice drills, then the basics video. Tick each off as you go.
 - **Inputs you can read at a glance.** Every move is drawn as arrows (filled when you hold the direction) and a 1-2-3-4 button pad, with a plain-English line like "hold back and button 1".
 - **Notation and frame data explained** in two short lists, so `d/f+1`, `~B`, `i13` and `-14` all make sense.
 
@@ -23,7 +23,11 @@ A phone-first **Tekken 7 Steve Fox** guide for complete beginners: a move list w
 - **Move list** of 100+ moves and strings, grouped by stance (Flicker, Peekaboo, Duck, Weaves, Sway, Albatross), searchable, with startup, damage, and frames on block, hit and counter hit. Block frames are coloured plus, safe or punishable.
 - **Punishers** by how negative the opponent's move was (-10, -12, -13, -15, after a low, whiff).
 - **Combos** from easy to advanced: counter-hit b+1, the bread-and-butter, wall-carry enders and a consistent wall option, with a practice routine.
-- **Tech:** stance cancels that make moves safe (with before-and-after frames), Flicker, Peekaboo, Duck, weaves, sway, parry, power crushes and Rage Drive, plus Tekken 7 basics like backdashing, sidestepping, throw breaks and Punishment Training.
+- **Stance map:** a tappable diagram of how Flicker, Peekaboo, Duck, Sway, the weaves and crouch connect, with the input on every path and the best moves from each stance.
+- **Input replay and clips:** every move can replay its inputs step by step, and links to Steve's top moves in the Complete Breakdown or a YouTube search for that move.
+- **Train tab:** six Practice-mode drills with exact setup (punishing, the ~B habit, counter hits, blocking lows, duck cancel, combos on both sides), plus matchup notes by character type (hellsweep characters, stance characters, grapplers, big characters, fast pokers).
+- **Links to each tab** (`#moves`, `#combos`, `#train`, ...) and a Copy link button, so you can send someone straight to a section.
+- **Tech:** duck cancel, stance cancels that make moves safe (with before-and-after frames), Flicker, Peekaboo, Duck, weaves, sway, parry, power crushes and Rage Drive, plus Tekken 7 basics like backdashing, sidestepping, throw breaks and Punishment Training.
 - **Video guides:** Tekken 7 Steve guides on YouTube, ordered beginner to deep dive, playable right in the app. The two-hour Complete Breakdown has chapter buttons.
 
 **Your progress**

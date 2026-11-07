@@ -66,6 +66,23 @@ t('every cited source exists', () => {
   for (const s of all) assert.ok(G.SOURCES[s], s);
 });
 
+t('stance map edges connect real nodes', () => {
+  const ids = new Set(G.STANCE_NODES.map((n) => n.id));
+  for (const e of G.STANCE_EDGES) assert.ok(ids.has(e.from) && ids.has(e.to), `${e.from}->${e.to}`);
+  for (const k of Object.keys(G.STANCE_MOVES)) assert.ok(ids.has(k), k);
+});
+
+t('every input in drills, matchups and the stance map parses cleanly', () => {
+  const all = [
+    ...G.DRILLS.flatMap((d) => d.inputs), ...G.MATCHUPS.flatMap((m) => m.tools),
+    ...G.STANCE_EDGES.flatMap((e) => e.inputs), ...Object.values(G.STANCE_MOVES).flat(),
+  ];
+  for (const x of all) {
+    const words = tokenize(x).filter((k) => k.kind === 'text');
+    assert.equal(words.length, 0, `unparsed text in ${x}`);
+  }
+});
+
 t('videos have YouTube ids', () => {
   for (const v of G.VIDEOS) assert.match(v.id, /^[\w-]{11}$/);
 });

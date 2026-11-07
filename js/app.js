@@ -14,13 +14,15 @@ const state = {
   path: saved.path || {},
   learned: saved.learned || {},
   combos: saved.combos || {},
+  drills: saved.drills || {},
+  stance: 'FLK',
   filter: 'key',
   query: '',
   open: null,
 };
 const persist = () => {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ tab: state.tab, path: state.path, learned: state.learned, combos: state.combos }));
+    localStorage.setItem(KEY, JSON.stringify({ tab: state.tab, path: state.path, learned: state.learned, combos: state.combos, drills: state.drills }));
   } catch { /* private mode: progress just isn't kept */ }
 };
 
@@ -49,6 +51,8 @@ function frameCell(label, v, cls = '') {
   return `<div class="fc ${cls}"><span>${label}</span><b>${esc(v)}</b></div>`;
 }
 
+const TOP_MOVES = 'https://www.youtube.com/watch?v=hH8w3mLAFfw&t=2584s';
+
 function moveCard(m, idx) {
   const open = state.open === idx;
   const learned = state.learned[m.c];
@@ -56,7 +60,7 @@ function moveCard(m, idx) {
   return `
   <article class="move ${open ? 'open' : ''}" data-safety="${s}">
     <button type="button" class="move-head" data-action="open" data-v="${idx}" aria-expanded="${open}">
-      <div class="move-in">${inputs(m.c)}<code>${esc(m.c)}</code></div>
+      <div class="move-in" data-replay="${idx}">${inputs(m.c)}<code>${esc(m.c)}</code></div>
       <div class="move-meta">
         <span class="lvls">${levelChip(m.lvl)}</span>
         ${m.i !== '-' ? `<span class="startup">i${esc(m.i)}</span>` : ''}
@@ -76,10 +80,20 @@ function moveCard(m, idx) {
         ${frameCell('On hit', m.hit)}
         ${frameCell('Counter hit', m.ch)}
       </div>
-      <button type="button" class="btn ${learned ? 'ghost' : ''}" data-action="learn" data-v="${esc(m.c)}">${learned ? 'Mark as not learned' : 'I can do this'}</button>
+      <div class="row">
+        <button type="button" class="btn ${learned ? 'ghost' : ''}" data-action="learn" data-v="${esc(m.c)}">${learned ? 'Mark as not learned' : 'I can do this'}</button>
+        <button type="button" class="btn ghost" data-action="replay" data-v="${idx}">▶ Replay inputs</button>
+      </div>
+      <p class="clips">Watch it:
+        ${m.clip ? `<a href="https://www.youtube.com/watch?v=${m.clip.id}&t=${m.clip.t}s" target="_blank" rel="noopener">clip ↗</a> · ` : ''}
+        ${m.key ? `<a href="${TOP_MOVES}" target="_blank" rel="noopener">Steve’s top moves (Complete Breakdown, 43:04) ↗</a> · ` : ''}
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(`tekken 7 steve fox ${m.c}`)}" target="_blank" rel="noopener">search YouTube ↗</a>
+      </p>
     </div>` : ''}
   </article>`;
 }
+
+const shareBtn = (label = 'Copy link') => `<button type="button" class="share" data-action="share">${esc(label)}</button>`;
 
 function section(id, title, inner, kicker = '') {
   return `<section class="panel" id="${id}">${kicker ? `<p class="kicker">${esc(kicker)}</p>` : ''}<h2>${esc(title)}</h2>${inner}</section>`;
@@ -97,7 +111,7 @@ function viewLearn() {
   const hero = `
   <header class="hero">
     <div class="hero-text">
-      <p class="kicker">Tekken 7 · Steve Fox</p>
+      <div class="head-top"><p class="kicker">Tekken 7 · Steve Fox</p>${shareBtn()}</div>
       <h1>Learn Steve from zero</h1>
       <p>A boxer who wins by poking safely and catching you pressing buttons. Follow the steps below in order.</p>
       ${next ? `<button type="button" class="btn light" data-action="go" data-tab="${next.tab}" data-anchor="${next.anchor || ''}" data-filter="${next.filter || ''}">Next: ${esc(next.title)}</button>` : '<p class="done-all">All steps done. Now go play ranked and come back to the combos.</p>'}
@@ -169,7 +183,7 @@ function viewMoves() {
     : '';
   return `
     <header class="page-head">
-      <p class="kicker">Move list</p>
+      <div class="head-top"><p class="kicker">Move list</p>${shareBtn()}</div>
       <h1>Moves</h1>
       <label class="search"><span class="sr">Search moves</span>
         <input id="q" type="search" placeholder="Search, e.g. b+1, low, tailspin" value="${esc(state.query)}" autocomplete="off">
@@ -221,7 +235,7 @@ function viewCombos() {
 
   return `
     <header class="page-head">
-      <p class="kicker">Damage</p>
+      <div class="head-top"><p class="kicker">Damage</p>${shareBtn()}</div>
       <h1>Punish &amp; combos</h1>
     </header>
     ${section('punish', 'Punishers', punish, 'Learn these first')}
@@ -232,13 +246,61 @@ function viewCombos() {
     ${section('practice', 'How to practise a combo', practice)}`;
 }
 
+function stanceMap() {
+  const W = 104;
+  const H = 44;
+  const node = (id) => G.STANCE_NODES.find((n) => n.id === id);
+  const sel = state.stance;
+  const clip = (a, b) => {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const t = Math.min(dx ? (W / 2 + 4) / Math.abs(dx) : 1, dy ? (H / 2 + 4) / Math.abs(dy) : 1);
+    return [a.x + dx * t, a.y + dy * t, b.x - dx * t, b.y - dy * t];
+  };
+  const edges = G.STANCE_EDGES.map((e) => {
+    const [x1, y1, x2, y2] = clip(node(e.from), node(e.to));
+    const on = e.from === sel || e.to === sel;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge ${on ? 'on' : ''}" marker-end="url(#${on ? 'ah-on' : 'ah'})"/>`;
+  }).join('');
+  const nodes = G.STANCE_NODES.map((n) => `
+    <g class="node ${n.id === sel ? 'on' : ''}" data-action="stance" data-v="${n.id}" tabindex="0" role="button" aria-pressed="${n.id === sel}" aria-label="${esc(n.label)}">
+      <rect x="${n.x - W / 2}" y="${n.y - H / 2}" width="${W}" height="${H}" rx="12"/>
+      <text x="${n.x}" y="${n.y - 3}" class="nl">${esc(n.label)}</text>
+      <text x="${n.x}" y="${n.y + 13}" class="ns">${esc(n.short)}</text>
+    </g>`).join('');
+  const s = node(sel);
+  const out = G.STANCE_EDGES.filter((e) => e.from === sel);
+  const into = G.STANCE_EDGES.filter((e) => e.to === sel);
+  const row = (e, dir) => `<li><span class="dirl">${dir === 'in' ? `From ${esc(node(e.from).label)}` : `To ${esc(node(e.to).label)}`}</span><div class="chips">${e.inputs.map((x) => `<span class="chip">${inputs(x)}</span>`).join('')}</div><p>${esc(e.note)}</p></li>`;
+  return `
+  <section class="panel" id="map">
+    <p class="kicker">Stance map</p>
+    <h2>How Steve moves</h2>
+    <p>Tap a stance to see how to get in, how to get out, and what to press from it.</p>
+    <div class="map-wrap">
+      <svg viewBox="0 0 400 350" class="map" role="group" aria-label="Steve's stances and how they connect">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ahead"/></marker>
+          <marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ahead on"/></marker>
+        </defs>
+        ${edges}${nodes}
+      </svg>
+    </div>
+    <h3>${esc(s.label)}</h3>
+    ${G.STANCE_MOVES[sel] ? `<p class="sub">Best moves here:</p><div class="chips">${G.STANCE_MOVES[sel].map((x) => `<span class="chip">${inputs(x)}</span>`).join('')}</div>` : ''}
+    <ul class="trans">${into.map((e) => row(e, 'in')).join('')}${out.map((e) => row(e, 'out')).join('')}</ul>
+    ${cite(['rbn', 'steam', 'salty'])}
+  </section>`;
+}
+
 function viewTech() {
   return `
     <header class="page-head">
-      <p class="kicker">Tech</p>
+      <div class="head-top"><p class="kicker">Tech</p>${shareBtn()}</div>
       <h1>Tech &amp; stances</h1>
       <p class="sub">Steve’s kick buttons are movement. These are the habits that make him work.</p>
     </header>
+    ${stanceMap()}
     ${G.TECH.map((g) => `
       <h2 class="group">${esc(g.group)}</h2>
       ${g.items.map((t) => `
@@ -291,7 +353,7 @@ function videoCard(v) {
 function viewVideos() {
   return `
     <header class="page-head">
-      <p class="kicker">Watch</p>
+      <div class="head-top"><p class="kicker">Watch</p>${shareBtn()}</div>
       <h1>Video guides</h1>
       <p class="sub">Tekken 7 Steve guides from the community, ordered from beginner up. Videos load only when you tap play.</p>
     </header>
@@ -303,7 +365,38 @@ function viewVideos() {
     </section>`;
 }
 
-const VIEWS = { learn: viewLearn, moves: viewMoves, combos: viewCombos, tech: viewTech, videos: viewVideos };
+function viewTrain() {
+  const done = G.DRILLS.filter((d) => state.drills[d.id]).length;
+  return `
+    <header class="page-head">
+      <div class="head-top"><p class="kicker">Practice mode</p>${shareBtn()}</div>
+      <h1>Train</h1>
+      <p class="sub">Drills with the exact Practice-mode setup, and how to fight each type of character. ${done} of ${G.DRILLS.length} drills done.</p>
+    </header>
+    <h2 class="group">Drills</h2>
+    <div class="drills">${G.DRILLS.map((d) => `
+      <article class="panel drill ${state.drills[d.id] ? 'got' : ''}">
+        <h3>${esc(d.title)}</h3>
+        <p class="sub">${esc(d.goal)}</p>
+        <div class="chips">${d.inputs.map((x) => `<span class="chip">${inputs(x)}</span>`).join('')}</div>
+        <p class="lbl">Setup</p>
+        <ol class="steps">${d.setup.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+        <p class="lbl">Reps</p>
+        <p>${esc(d.reps)}</p>
+        <button type="button" class="btn ${state.drills[d.id] ? 'ghost' : ''}" data-action="drill" data-v="${d.id}">${state.drills[d.id] ? 'Done ✓' : 'Mark drill done'}</button>
+      </article>`).join('')}</div>
+    <h2 class="group" id="matchups">Matchups</h2>
+    <p class="sub gutter">General Tekken 7 knowledge applied to Steve’s tools. For a single character, the matchup video in the Videos tab shows how deep this goes.</p>
+    ${G.MATCHUPS.map((m) => `
+      <section class="panel">
+        <h3>${esc(m.type)}</h3>
+        <p class="who">${esc(m.who)}</p>
+        <p>${esc(m.plan)}</p>
+        <div class="chips">${m.tools.map((x) => `<span class="chip">${inputs(x)}</span>`).join('')}</div>
+      </section>`).join('')}`;
+}
+
+const VIEWS = { learn: viewLearn, moves: viewMoves, combos: viewCombos, tech: viewTech, train: viewTrain, videos: viewVideos };
 
 /* ---------- Render & events ---------- */
 
@@ -321,7 +414,9 @@ function draw({ keepScroll = false, focusSearch = false } = {}) {
 }
 
 function go(tab, anchor, filter) {
+  if (!VIEWS[tab]) return;
   state.tab = tab;
+  try { if (location.hash !== `#${tab}`) location.hash = tab; } catch { /* hash not available */ }
   if (filter) { state.filter = filter; state.query = ''; }
   persist();
   draw();
@@ -335,6 +430,32 @@ document.addEventListener('click', (e) => {
   if (!el) return;
   const { action, v } = el.dataset;
   if (action === 'tab') go(v);
+  if (action === 'stance') {
+    state.stance = v;
+    draw({ keepScroll: true });
+  }
+  if (action === 'drill') {
+    state.drills[v] = !state.drills[v];
+    persist();
+    draw({ keepScroll: true });
+    if (state.drills[v]) toast('Drill done');
+  }
+  if (action === 'share') {
+    const url = location.href.split('#')[0] + '#' + state.tab;
+    const done = () => toast('Link copied');
+    try {
+      navigator.clipboard.writeText(url).then(done, () => toast(url));
+    } catch { toast(url); }
+  }
+  if (action === 'replay') {
+    const box = document.querySelector(`[data-replay="${v}"] .inputs`);
+    if (box) {
+      box.classList.remove('playing');
+      [...box.children].forEach((c, i) => c.style.setProperty('--i', i));
+      void box.offsetWidth;
+      box.classList.add('playing');
+    }
+  }
   if (action === 'go') go(el.dataset.tab, el.dataset.anchor, el.dataset.filter);
   if (action === 'path') {
     state.path[v] = !state.path[v];
@@ -381,6 +502,24 @@ document.addEventListener('input', (e) => {
   }
 });
 
+document.addEventListener('keydown', (e) => {
+  const g = e.target.closest && e.target.closest('g[data-action="stance"]');
+  if (g && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    state.stance = g.dataset.v;
+    draw({ keepScroll: true });
+  }
+});
+
+window.addEventListener('hashchange', () => {
+  const h = location.hash.slice(1);
+  if (VIEWS[h] && h !== state.tab) go(h);
+});
+
+{
+  const h = location.hash.slice(1);
+  if (VIEWS[h]) state.tab = h;
+}
 draw();
 
 try {
